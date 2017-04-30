@@ -1,3 +1,11 @@
+#ADICIONAR:
+# KFCM
+#SSFCM_MACARIO
+#WSSFCM_KONG
+#SSFCM_LI
+#SSKFCM
+
+
 setwd("C:/Users/Gerson/Documents")
 library(ggplot2) 
 library(caret)
