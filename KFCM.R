@@ -1,9 +1,13 @@
-kfcm <- function(db,C, V = NULL, m = 2, kernel_f = "polynomial", th = 0.01, iter.max = 200){
+kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01, iter.max = 200){
   
   #Verificando se tem o valor de C ou V
   if(is.null(V) && is.null(C)){
     cat("C e V NULL")
     return(NULL)
+  }
+  
+  if(is.null(kernel_f)){
+    kernel_f = "polynomial"
   }
   
   dim = ncol(db)
