@@ -25,7 +25,7 @@ sskfcm_function <- function(db ,V = NULL, m = 2, kernel_f = "polynomial", th = 0
   U_L = initialize_U_L(db_L, C)
   
   #Encontrando os valores iniciais de V
-  V = initialize_V(db_L, U_L)
+  phi_V = initialize_V(db_L, U_L)
   
   #Criando matriz U_U
   U_U = initialize_U_U(db_U, C)
@@ -38,6 +38,24 @@ sskfcm_function <- function(db ,V = NULL, m = 2, kernel_f = "polynomial", th = 0
 # break_db <- function(db){
 #   return(db2)
 # }
+atualiza_V <- function(db_L, U_L){
+  N_L = nrow(db_L)
+  dim = ncol(db_L) - 1
+  C = ncol(U_L)
+  
+  #Criando V como definido na eq 12
+  V = as.data.frame(matrix(ncol = dim, nrow = C))
+  for(j in 1:C){
+    sum = 0
+    for(i in 1:N_L){
+      sum = sum + (U_L[i,j] * db_L[i,1:dim])
+    }
+    V[j,] = (sum / sum(U_L[,j]))
+  }
+  
+  colnames(V) = c(1:dim)
+  return(V)
+}
 
 initialize_V <- function(db_L, U_L){
   N_L = nrow(db_L)
@@ -49,7 +67,7 @@ initialize_V <- function(db_L, U_L){
   for(j in 1:C){
     sum = 0
     for(i in 1:N_L){
-      sum = sum + (U_L[i,j] * db_L[i,])
+      sum = sum + (U_L[i,j] * db_L[i,1:dim])
     }
     V[j,] = (sum / sum(U_L[,j]))
   }
@@ -122,7 +140,15 @@ update_U_U <- function(db_U,U_U,V){
   U = as.data.frame(matrix(ncol = C,nrow = N_U))
   for(i in 1:N_U){
     for(j in 1:C){
-      
+      sum = 0
+      for(k in 1:C){
+        #sum = sum + (U_U[i,j] * V[k,] * sqrt(kernel_func(db_U[i,])))
+        sum = sum + (U_U[i,j] * kernel_func(db_U[i,],V[k,]))
+        #cat("\n U ",kernel_func(db_U[i,],V[k,]))
+      }
+      cat(sum,"\n")
+      #U[i,j] = (U_U[i,j]* V[j,] * sqrt(kernel_func(db_U[i,])))/sum
+      U[i,j] = (U_U[i,j]* kernel_func(db_U[i,],V[j,]))/sum
     }
   }
   
