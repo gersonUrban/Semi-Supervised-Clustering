@@ -116,7 +116,15 @@ initialize_U_U <- function(db_U,C){
   return(U_U)
 }
 
-update_U_U <- function(){
+update_U_U <- function(db_U,U_U,V){
+  N_U = nrow(db_U)
+  C = ncol(U_U)
+  U = as.data.frame(matrix(ncol = C,nrow = N_U))
+  for(i in 1:N_U){
+    for(j in 1:C){
+      
+    }
+  }
   
 }
 
