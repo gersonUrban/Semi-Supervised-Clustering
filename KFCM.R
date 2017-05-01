@@ -36,6 +36,7 @@ kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01){
   t = 0
   while(erro > th){
     t = t + 1
+    cat("\n iteracao: ",t)
     
     k_m = update_kernel_matrix(U,db)
     U2 = update_U(db,k_m)
@@ -50,34 +51,39 @@ kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01){
       erro = erro + sum
     }
     
+    cat(" , Diferenca: ",erro)
+    
     U = U2
     
   }
   
-  #Encontrando a "classificacao"
-  classificados = db
-  classificados[,dim] = 0
-  size = vector(length = C)
-  
-  #Fiz na "mao" arrumar depois
-  for(i in 1:N){
-    for(j in 1:C){
-      if(U[i,j] == max(U[i,])){
-        classificados[i,dim] = j
-        size[j] = size[j] + 1
-      }
-    }
-  }
+  # #Encontrando a "classificacao"
+  # classificados = db
+  # classificados[,dim] = 0
+  # size = vector(length = C)
+  # 
+  # #Fiz na "mao" arrumar depois
+  # for(i in 1:N){
+  #   for(j in 1:C){
+  #     if(U[i,j] == max(U[i,])){
+  #       classificados[i,dim] = j
+  #       size[j] = size[j] + 1
+  #     }
+  #   }
+  # }
   
   #Preparando o retorno
   res = NULL
   #res$centers = V #Pensar em como arrumar o centroide
-  res$size = size
-  res$cluster = classificados[,dim+1]
+  res$centers = k_m$K_V_V
+  res$K_X_V = k_m$K_X_V
+  #res$size = size
+  #res$cluster = classificados[,dim+1]
   res$membership = U
   res$iter = t
   res$withinerror = "TODO"
   res$call = "TODO"
+  return(res)
 }
 
 initialize_V <- function(C, dim, max, min){
@@ -126,7 +132,6 @@ update_kernel_matrix <- function(U, db){
       kernel_matrix$K_X_V[i,j] = sum/sum((U[,j])^2)
       sum3 = sum3 + sum2
     }
-    cat("\n j = ",j)
     kernel_matrix$K_V_V[j,] = sum2/(sum((U[,j])^2))^2
   }
   

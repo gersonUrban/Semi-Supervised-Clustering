@@ -10,4 +10,7 @@ plot(db1[,1:2], pch = c(15, 16, 17)[fac], col=fac)
 setwd("C:/Users/Gerson/Documents/GitHub/Semi-Supervised-Clustering")
 
 source("KFCM.R")
-kfcm = kfcm(db1[,1:2],2)
+C = 2
+kfcm_result = kfcm(db1[,1:2],C)
+
+kfcm_result
