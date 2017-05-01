@@ -97,18 +97,40 @@ update_kernel_matrix <- function(U, db){
   kernel_matrix$K_V_V = matrix(nrow = C,0)
   
   #Arrumar depois, tirar os laços e o 2(no lugar do m)
-  for(i in 1:N){
-    for(j in 1:C){
+  # for(i in 1:N){
+  #   for(j in 1:C){
+  #     for(k in 1:N){
+  #       sum = (U[k,j])^2 * kernel_func(db[k,],db[i,])
+  #       for(l in 1:N){
+  #         sum2 = (U[k,j])^2 * (U[l,j])^2 * kernel_func(db[k,],db[l,])
+  #       }
+  #     }
+  #     kernel_matrix$K_X_V[i,j] = sum/sum((U[,j])^2)
+  #     kernel_matrix$K_V_V[j,] = sum2/(sum((U[,j])^2))^2
+  #   }
+  # }
+  
+  
+  for(j in 1:C){
+    sum3 = 0
+    for(i in 1:N){
+      sum = 0
+      sum2 = 0
       for(k in 1:N){
-        sum = (U[k,j])^2 * kernel_func(db[k,],db[i,])
-        for(l in 1:N){
-          sum2 = (U[k,j])^2 * (U[l,j])^2 * kernel_func(db[k,],db[l,])
-        }
+        sum = sum + ((U[k,j])^2 * kernel_func(db[k,],db[i,]))
+        sum2 = sum2 + ((U[i,j])^2 * (U[k,j])^2 * kernel_func(db[i,],db[k,]))
+        # for(l in 1:N){
+        #   sum2 = (U[k,j])^2 * (U[l,j])^2 * kernel_func(db[k,],db[l,])
+        # }
       }
       kernel_matrix$K_X_V[i,j] = sum/sum((U[,j])^2)
-      kernel_matrix$K_V_V[j,] = sum2/(sum((U[,j])^2))^2
+      sum3 = sum3 + sum2
     }
+    cat("\n j = ",j)
+    kernel_matrix$K_V_V[j,] = sum2/(sum((U[,j])^2))^2
   }
+  
+  
   
   return(kernel_matrix)
 }
