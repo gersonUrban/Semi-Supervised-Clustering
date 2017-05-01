@@ -135,6 +135,7 @@ initialize_U_U <- function(db_U,C){
 }
 
 update_U_U <- function(db_U,U_U,V){
+  #Provavelmente tenho que arrumar
   N_U = nrow(db_U)
   C = ncol(U_U)
   U = as.data.frame(matrix(ncol = C,nrow = N_U))
@@ -142,13 +143,15 @@ update_U_U <- function(db_U,U_U,V){
     for(j in 1:C){
       sum = 0
       for(k in 1:C){
-        #sum = sum + (U_U[i,j] * V[k,] * sqrt(kernel_func(db_U[i,])))
-        sum = sum + (U_U[i,j] * kernel_func(db_U[i,],V[k,]))
+        #sum = sum + (U_U[i,j] * phi_V[k,] * sqrt(kernel_func(db_U[i,])))
+        sum = sum + (U_U[i,j] * V[k,] * sqrt(kernel_func(db_U[i,])))
+        #sum = sum + (U_U[i,j] * kernel_func(db_U[i,],V[k,]))
         #cat("\n U ",kernel_func(db_U[i,],V[k,]))
       }
-      cat(sum,"\n")
-      #U[i,j] = (U_U[i,j]* V[j,] * sqrt(kernel_func(db_U[i,])))/sum
-      U[i,j] = (U_U[i,j]* kernel_func(db_U[i,],V[j,]))/sum
+      #cat(sum,"   -   ",(U_U[i,j]* phi_V[j,] * sqrt(kernel_func(db_U[i,]))),"\n")
+      #U[i,j] = (U_U[i,j]* phi_V[j,] * sqrt(kernel_func(db_U[i,])))/sum
+      U[i,j] = (U_U[i,j]* V[j,] * sqrt(kernel_func(db_U[i,])))/sum
+      #U[i,j] = (U_U[i,j]* kernel_func(db_U[i,],V[j,]))/sum
     }
   }
   
