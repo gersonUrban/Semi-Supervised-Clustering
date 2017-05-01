@@ -1,4 +1,4 @@
-kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01){
+kfcm <- function(db,C, V = NULL, m = 2, kernel_f = "polynomial", th = 0.01, iter.max = 200){
   
   #Verificando se tem o valor de C ou V
   if(is.null(V) && is.null(C)){
@@ -34,7 +34,7 @@ kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01){
   
   erro = 1 + th
   t = 0
-  while(erro > th){
+  while((erro > th)&&(t < iter.max)){
     t = t + 1
     cat("\n iteracao: ",t)
     
@@ -72,13 +72,28 @@ kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01){
   #   }
   # }
   
+  #Encontrando a classificacao
+  classificados = db
+  classificados[,dim+1] = 0
+  size = vector(length = C)
+  
+  #Fiz na "mao" arrumar depois
+  for(i in 1:N){
+    for(j in 1:C){
+      if(U[i,j] == max(U[i,])){
+        classificados[i,(dim+1)] = j
+        size[j] = size[j] + 1
+      }
+    }
+  }
+  
   #Preparando o retorno
   res = NULL
   #res$centers = V #Pensar em como arrumar o centroide
   res$centers = k_m$K_V_V
   res$K_X_V = k_m$K_X_V
-  #res$size = size
-  #res$cluster = classificados[,dim+1]
+  res$size = size
+  res$cluster = classificados[,dim+1]
   res$membership = U
   res$iter = t
   res$withinerror = "TODO"
@@ -199,16 +214,40 @@ update_U <- function(db, kernel_matrix){
 }
 
 
-kernel_func <- function(a,b = NULL){
-  a = as.matrix(a)
-  a = a[1,]
-  if(is.null(b)){
-    phi = (a %*% a)^2
+kernel_func <- function(a,b = NULL){#, kernel_f = "polynomial"){
+  if(kernel_f == "polynomial"){
+    a = as.matrix(a)
+    a = a[1,]
+    if(is.null(b)){
+      phi = ((a %*% a)+1)^2
+    }
+    else{
+      b = as.matrix(b)
+      b = b[1,]
+      phi = ((a %*% b)+1)^2
+    }
   }
-  else{
-    b = as.matrix(b)
-    b = b[1,]
-    phi = (a %*% b)^2
+  if(kernel_f == "RBF"){
+    #Gaussian Kernel
+    if(is.null(b)){
+      d = dist(rbind(a,a))
+    }
+    else{
+      d = dist(rbind(a,b))
+    }
+    phi = exp(-(d^2)/2)
+  }
+  if(kernel_f == "tanh"){
+    a = as.matrix(a)
+    a = a[1,]
+    if(is.null(b)){
+      phi = tanh((a %*% a)+1)
+    }
+    else{
+      b = as.matrix(b)
+      b = b[1,]
+      phi = tanh((a %*% b)+1)
+    }
   }
   return(phi)
 }
