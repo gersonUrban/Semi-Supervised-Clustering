@@ -14,38 +14,128 @@ sskfcm_function <- function(db ,V = NULL, m = 2, kernel_f = "polynomial", th = 0
   #Unlabel DataSet
   db_U = db[!aux,1:dim]
   #Label DataSet
-  db_L = db[aux,]
-  
+  db_L = db[aux,1:(dim+1)]
   
   #Encontrando a quantidade de classes
-  rotulados = as.factor(db$class[aux])
+  rotulados = as.factor(db_L[,3])
   classes = as.numeric(names(table(rotulados)))
-  nclasses = length(classes)
+  C = length(classes)
+  
+  #Criando a matriz U_L 
+  U_L = initialize_U_L(db_L, C)
+  
+  #Encontrando os valores iniciais de V
+  V = initialize_V(db_L, U_L)
+  
+  #Criando matriz U_U
+  U_U = initialize_U_U(db_U, C)
+  
+  
 }
 
-break_db <- function(db){
+
+
+# break_db <- function(db){
+#   return(db2)
+# }
+
+initialize_V <- function(db_L, U_L){
+  N_L = nrow(db_L)
+  dim = ncol(db_L) - 1
+  C = ncol(U_L)
   
-  db2 = NULL
-  db2$label <- 0 
-  db2$unlabel <- 0
-  return(db2)
+  #Criando V como definido na eq 12
+  V = as.data.frame(matrix(ncol = dim, nrow = C))
+  for(j in 1:C){
+    sum = 0
+    for(i in 1:N_L){
+      sum = sum + (U_L[i,j] * db_L[i,])
+    }
+    V[j,] = (sum / sum(U_L[,j]))
+  }
+  
+  colnames(V) = c(1:dim)
+  #Calculando phi como definido na eq 11
+  #Como K(xi,xi) = phi(xi) * phi(xi), então phi(xi) = sqrt(K(xi,xi))
+  
+  phi = as.data.frame(matrix(nrow = C))
+  for(j in 1:C){
+    sum = 0
+    sum2 = 0
+    for(i in 1:N_L){
+      sum = sum + (U_L[i,j]* kernel_func(db_L[i,],V[j,])* sqrt(kernel_func(db_L[i,])))
+      sum2 = sum2 + (U_L[i,j]* kernel_func(db_L[i,],V[j,]))
+    }
+    phi[j,] = sum/sum2
+  }
+  return(phi)
 }
 
-initialize_V <- function(){
+update_V <- function(db_L,db_U,U_L,U_U,V){
+  # Fazendo como na eq 10
+  #Como K(xj,Vi) = phi(Xj) * phi(Vi), então K(xj,Vi) = sqrt(K(xj,xj)) * phi(Vi)
+  # E como na eq 10 é K(xj,Vi) * phi(Xj), então = K(xj,xj) * phi(vi)
+  N_L = nrow(db_L)
+  N_U = nrow(db_U)
+  C = ncol(U_U)
+  dim = ncol(db_U)
   
+  phi = as.data.frame(matrix(nrow = C))
+  for(i in 1:C){
+    sum = 0
+    sum2 = 0
+    sum3 = 0
+    sum4 = 0
+    for(l in 1:N_L){
+      sum = sum + (U_L[l,i]* kernel_func(db_L[l,])* V[i,])
+      sum2 = sum2 + (U_L[l,j]* sqrt(kernel_func(db_L[l,]))*V[i,])
+    }
+    for(u in 1:N_U){
+      sum3 = sum3 + (U_U[u,i]* kernel_func(db_U[u,])* V[i,])
+      sum4 = sum4 + (U_U[u,j]* sqrt(kernel_func(db_U[u,]))*V[i,])
+    }
+    phi[i,] = (sum + sum3)/(sum2 + sum4)
+  }
   return(V)
 }
 
-update_V <- function(){
+initialize_U_U <- function(db_U,C){
   
-  return(V)
+  #Fazendo como descrito no artigo
+  N_U = nrow(db_U)
+  U_U = matrix(nrow = N_U, ncol = C)
+  
+  for(i in 1:N_U){
+    #Generate C positive random numbers
+    r = runif(C)
+    for(j in 1:C){
+      U_U[i,j] = r[j]/sum(r)
+    }
+  }
+  
+  return(U_U)
 }
 
-update_U_def <- function(){
+update_U_U <- function(){
   
 }
 
-update_U_super <- function(){
+initialize_U_L <- function(db_L,C){
+  #(já que não é dado um valor pelo especialista, como descrito no artigo, então vou setar 0.99 e 0.01 de acordo com seus rotulos)
+  N_L = nrow(db_L)
+  U_L = matrix(nrow = N_L, ncol = C, 0.01)
+  for(i in 1: N_L){
+    for(j in 1:C){
+      if(db_L[i,dim+1] == j){
+        U_L[i,j] = 0.99
+      }
+    }
+  }
+  
+  return(U_L)
+}
+
+update_U_L <- function(){
   
   return(U)
 }
