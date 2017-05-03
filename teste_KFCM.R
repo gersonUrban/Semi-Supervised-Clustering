@@ -1,4 +1,4 @@
-setwd("C:/Users/Gerson/Documents/Mestrado/Algoritmos/DataSets")
+setwd("C:/Users/Gerson/Documents/AlgoritmosAntigos/DataSets")
 db1 = read.csv("dadosGerados_PCM_100.csv")
 fac = as.factor(db1[,3])
 plot(db1)

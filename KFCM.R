@@ -1,5 +1,7 @@
 kfcm <- function(db,C, V = NULL, m = 2, kernel_f = NULL, th = 0.01, iter.max = 200){
   
+  kernel_f <<- kernel_f
+  
   #Verificando se tem o valor de C ou V
   if(is.null(V) && is.null(C)){
     cat("C e V NULL")
@@ -183,6 +185,8 @@ initialize_U <- function(db, V){
     B[i,] = sum(A[i,])
   }
   
+  U = as.data.frame(matrix(ncol = C, nrow = N))
+  
   for(i in 1:N){
     U[i,1:dim] = A[i,1:dim]/B[i]
   }
@@ -210,7 +214,7 @@ update_U <- function(db, kernel_matrix){
   for(i in 1:N){
     B[i,] = sum(A[i,])
   }
-  
+  U = as.data.frame(matrix(ncol = C, nrow = N))
   for(i in 1:N){
     U[i,1:dim] = A[i,1:dim]/B[i]
   }
