@@ -1,18 +1,21 @@
-setwd("C:/Users/Gerson/Documents/Mestrado/Algoritmos/DataSets")
-db = read.csv("Circular_443_SS10.csv")
+rm(list = ls())
+setwd("C:/Users/Gerson/Documents/AlgoritmosAntigos/DataSets")
+db = read.csv("Circular_443_SS30_N.csv")
 
-fac = as.factor(db[,3])
-plot(db)
-plot(db[,1:2])
-col.list <- c("gray","blue","red","green")
-palette(col.list)
-plot(db[,1:2], pch = c(3, 15, 16)[fac], col=fac)
+# fac = as.factor(db[,3])
+# plot(db)
+# plot(db[,1:2])
+# col.list <- c("gray","blue","red","green")
+# palette(col.list)
+# plot(db[,1:2], pch = c(3, 15, 16)[fac], col=fac)
 
 setwd("C:/Users/Gerson/Documents/GitHub/Semi-Supervised-Clustering")
-
+sigma = 1
+kernel_f = "RBF"
+iter.max = 50
 source("SSKFCM.R")
-C = 2
-sskfcm_result = sskfcm(db1[,1:2],C, kernel_f = "RBF")
+#C = 2
+sskfcm_result = sskfcm_function(db[,1:2], kernel_f = "polynomial")
 
 #Plot apenas com os valores classificados
 family = as.factor(sskfcm_result$cluster)
