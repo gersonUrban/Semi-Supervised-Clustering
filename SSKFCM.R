@@ -2,7 +2,7 @@ sskfcm_function <- function(db ,V = NULL, m = 2, kernel_f = "polynomial", th = 0
   #O db deve estar comvalores numéricos para as classes e 0 para os não rotulados
   
   #Tornando variavel global
-  #kernel_f <<- kernel_f
+  kernel_f <<- kernel_f
   #dimensão da base de dados e seu tamanho
   dim = ncol(db)-1
   N = nrow(db)  

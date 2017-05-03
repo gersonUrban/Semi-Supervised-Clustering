@@ -1,4 +1,5 @@
-setwd("C:/Users/Gerson/Documents/Mestrado/Algoritmos/DataSets")
+library(dplyr)
+setwd("C:/Users/Gerson/Documents/AlgoritmosAntigos/DataSets")
 db1 = read.csv("dadosGerados_PCM_100.csv")
 
 #dimensão da base de dados e seu tamanho
@@ -20,6 +21,17 @@ db = db1[,3] > 0
 db = db1[db,]
 db3 = db
 N = nrow(db)
-dados = sample(1:N,N*0.9)
+dados = sample(1:N,N*0.1)
 db3[dados,3] = 0
-write.csv(db3,"Circular_443_SS10.csv", row.names = F)
+write.csv(db3,"Circular_443_SS90.csv", row.names = F)
+plot(db3[,1:2])
+
+#Normalizando
+minimo <- apply(db3[,1:dim],2, min)
+maximo <- apply(db3[,1:dim],2, max)
+teste = sapply(db3[,1:dim],function(x){
+  return((x - minimo)/(maximo-minimo))
+})
+plot(teste)
+db3 = cbind(teste,db3[,dim+1])
+write.csv(db3,"Circular_443_SS90_N.csv", row.names = F)
